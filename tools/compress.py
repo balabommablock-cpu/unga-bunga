@@ -115,24 +115,24 @@ def compress_fast(content: str) -> str:
         # Remove trailing header markers
         line = re.sub(r"(#{1,6}\s+.+?)\s*#{1,6}\s*$", r"\1", line)
 
-        # Remove inline bold/italic that doesn't change meaning in instructions
-        # **word** → word (in non-heading, non-list-start context)
-        # Keep bold in headings and at start of list items (structural)
+        # Strip bold/italic ONLY on purely decorative emphasis
+        # Keep bold on: NEVER, ALWAYS, MUST, CRITICAL, DO NOT, WARNING — these change behavior
+        # Keep bold at start of list items (structural labels)
         if not stripped.startswith("#") and not re.match(r"^[-*]\s+\*\*", stripped):
-            line = re.sub(r"\*\*([^*]+?)\*\*", r"\1", line)
-            line = re.sub(r"\*([^*]+?)\*", r"\1", line)
+            # Only strip bold on words that aren't behavioral emphasis
+            emphasis_words = r"(?:NEVER|ALWAYS|MUST|CRITICAL|DO NOT|WARNING|IMPORTANT|REQUIRED|NOTE)"
+            line = re.sub(r"\*\*(" + emphasis_words + r"[^*]*?)\*\*", r"**\1**", line)  # keep these
+            # Strip italic only (single *), not bold
+            line = re.sub(r"(?<!\*)\*([^*]+?)\*(?!\*)", r"\1", line)
 
         # Remove trailing whitespace
         line = line.rstrip()
 
-        # Remove parenthetical examples
+        # Remove parenthetical examples — but only pure examples, not constraints
+        # "(e.g., foo)" is an example. "(must be BIGINT)" is a constraint.
         line = re.sub(r"\s*\(e\.g\.,?\s*[^)]+\)", "", line)
-        line = re.sub(r"\s*\(i\.e\.,?\s*[^)]+\)", "", line)
         line = re.sub(r"\s*\(for example,?\s*[^)]+\)", "", line)
-
-        # Remove em-dash explanatory clauses at end of lines: "— explanation"
-        # Only if the line has content before the dash
-        line = re.sub(r"\s+—\s+[^—]+$", "", line)
+        # Keep (i.e., ...) — these are definitions, not examples
 
         # Compress wordy phrases
         line = line.replace("in order to", "to")

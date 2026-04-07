@@ -50,7 +50,7 @@ And that's one project. You have seven.
 
 | Layer | What's wasted | Savings | How |
 |-------|--------------|---------|-----|
-| CLAUDE.md bloat | ~3,500 tokens/msg | **40-60%** | Compressor strips prose, collapses tables |
+| CLAUDE.md bloat | ~3,500 tokens/msg | **7-60%** | Fast mode: safe rules. Deep mode: Claude-powered. |
 | Output verbosity | ~200 tokens/response | **50-70%** | 50-token skill kills preambles & summaries |
 | Tool call waste | ~800 tokens/call | **60-80%** | Read ranges, grep smart, skip re-reads |
 | Stale memory | ~500 tokens/msg | **100%** | Audit finds it, you delete it |
@@ -82,7 +82,7 @@ Your `CLAUDE.md` has opinions about typography. It has example conversations. It
 
 The compressor strips the prose, collapses the tables, kills the filler — keeps every rule that actually changes Claude's behavior. Backs up your original because we're not monsters.
 
-Fast mode: 15-30% smaller. Deep mode: 40-60%. On a heavy CLAUDE.md, that's **1,400-2,100 tokens you stop paying for. Every message. Forever.** Multiply that by 40 messages a session. Multiply that by 5 sessions a day. Now multiply that by the fact that you feel nothing because nothing changed except your bill.
+Fast mode: 7-15% smaller — safe, no API needed, won't touch anything that looks like a constraint. Deep mode: 40-60% — uses Claude to understand what's actually a rule vs what's prose, so it can cut deeper without cutting wrong. On a heavy CLAUDE.md, deep mode saves **1,400-2,100 tokens. Every message. Forever.** Multiply that by 40 messages a session. Multiply that by 5 sessions a day. Now multiply that by the fact that you feel nothing because nothing changed except your bill.
 
 ### The Skill — 50 tokens that mass replace 300
 
@@ -131,6 +131,20 @@ No preambles, summaries, or filler. After edits, say nothing unless there's an e
 20 tokens. Kills the "Let me read that file for you..." and "Here's a summary of the changes I made..." monologues. Claude talks less, you pay less, everyone's happier.
 
 It's like telling your coworker they don't need to narrate their screen share.
+
+## "But will it make Claude dumber?"
+
+No. And here's why that's the wrong question.
+
+**What we cut:** Prose that restates rules Claude already understands. Tables formatted for human readability that Claude doesn't need. Parenthetical examples of concepts a language model invented. Italic emphasis on words that aren't behavioral constraints. Blank lines. Decoration. Vibes.
+
+**What we keep:** Every `NEVER`, every `ALWAYS`, every `MUST`. Every technical spec. Every schema. Every constraint that actually changes Claude's behavior. Bold emphasis on words that matter. Code blocks with real values.
+
+**What the skill does:** Stops Claude from narrating its actions. Not from thinking. When you ask "why did this break?" you still get a full explanation. When you say "fix this typo" you don't get a 4-paragraph essay about what a typo is.
+
+The rule is simple: **brevity on actions, depth on understanding.**
+
+Your CLAUDE.md is not a conversation. It's a config file. We treat it like one. Claude doesn't get dumber — it just stops doing homework it already finished.
 
 ## Install
 
